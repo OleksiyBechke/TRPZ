@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>PowerShell Terminal Web</title>
+    <style>
+        /* Динамічні стилі на основі обраної стратегії */
+        body {
+            font-family: 'Consolas', monospace;
+            background-color: [[${theme.backgroundColor}]]; /* Значення зі стратегії */
+            color: [[${theme.textColor}]];                 /* Значення зі стратегії */
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .terminal-window {
+            width: 80%;
+            margin: 0 auto;
+            border: 1px solid #555;
+            min-height: 400px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .prompt {
+            color: [[${theme.promptColor}]]; /* Значення зі стратегії */
+            font-weight: bold;
+        }
+
+        .command {
+            color: [[${theme.commandColor}]]; /* Значення зі стратегії */
+        }
+
+        .controls {
+            width: 80%;
+            margin: 0 auto 20px auto;
+            text-align: right;
+        }
+
+        button {
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <form action="/change-theme" method="post">
+        <label>Оберіть тему (Strategy): </label>
+        <select name="themeName">
+            <option value="dark" th:selected="${currentThemeName == 'dark'}">Dark Theme</option>
+            <option value="light" th:selected="${currentThemeName == 'light'}">Light Theme</option>
+        </select>
+        <button type="submit">Застосувати</button>
+    </form>
+</div>
+
+<div class="terminal-window">
+    <div>
+        <span class="prompt">PS User&gt;</span>
+        <span class="command">Write-Host "Hello Web Strategy"</span>
+    </div>
+    <div>
+        <span>Hello Web Strategy</span>
+    </div>
+    <br/>
+    <div>
+        <span class="prompt">PS User&gt;</span>
+        <span class="cursor">_</span>
+    </div>
+</div>
+
+</body>
+</html>
