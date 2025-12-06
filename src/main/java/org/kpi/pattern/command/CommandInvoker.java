@@ -1,8 +1,6 @@
-package org.kpi.service;
+package org.kpi.pattern.command;
 
 import lombok.Getter;
-import org.kpi.pattern.command.Command;
-import org.kpi.pattern.command.PowerShellExecuteCommand;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

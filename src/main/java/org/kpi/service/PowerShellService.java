@@ -1,37 +1,35 @@
 package org.kpi.service;
 
+import org.kpi.pattern.bridge.ExecutionEngine;
+import org.kpi.pattern.bridge.TerminalSystem;
+import org.kpi.pattern.bridge.WebTerminalSystem;
+import org.kpi.pattern.bridge.WindowsPowerShellEngine;
+import org.kpi.pattern.bridge.TestMockEngine;
 import org.springframework.stereotype.Service;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
-/**
- * Receiver (Одержувач).
- * Знає, як фактично запустити процес PowerShell.
- */
 @Service
 public class PowerShellService {
 
+    private TerminalSystem terminalSystem;
+
+    public PowerShellService() {
+        ExecutionEngine defaultEngine = new WindowsPowerShellEngine();
+        this.terminalSystem = new WebTerminalSystem(defaultEngine);
+    }
+
     public String runCommand(String commandText) {
-        StringBuilder output = new StringBuilder();
-        try {
-            ProcessBuilder builder = new ProcessBuilder("powershell.exe", "/c", commandText);
-            builder.redirectErrorStream(true);
-            Process process = builder.start();
+        return terminalSystem.run(commandText);
+    }
 
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream(), Charset.forName("CP866"))
-            );
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
-            }
-
-            process.waitFor();
-        } catch (Exception e) {
-            return "Error executing command: " + e.getMessage();
+    public void switchEngine(String engineType) {
+        if ("mock".equalsIgnoreCase(engineType)) {
+            terminalSystem.setEngine(new TestMockEngine());
+        } else {
+            terminalSystem.setEngine(new WindowsPowerShellEngine());
         }
-        return output.toString();
+    }
+
+    public String getCurrentEngineName() {
+        return terminalSystem.toString();
     }
 }

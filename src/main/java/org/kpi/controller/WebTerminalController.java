@@ -3,8 +3,8 @@ package org.kpi.controller;
 import org.kpi.pattern.abstractFactory.WebUIFactory;
 import org.kpi.pattern.abstractFactory.dark.DarkUIFactory;
 import org.kpi.pattern.abstractFactory.light.LightUIFactory;
+import org.kpi.pattern.command.CommandInvoker;
 import org.kpi.pattern.command.PowerShellExecuteCommand;
-import org.kpi.service.CommandInvoker;
 import org.kpi.service.PowerShellService;
 import org.kpi.pattern.strategy.ThemeContext;
 import org.springframework.stereotype.Controller;
@@ -19,6 +19,9 @@ public class WebTerminalController {
     private final ThemeContext themeContext;
     private final PowerShellService powerShellService;
     private final CommandInvoker commandInvoker;
+
+    // Зберігаємо поточний стан вибору двигуна для відображення в UI
+    private String currentEngine = "windows";
 
     public WebTerminalController(ThemeContext themeContext,
                                  PowerShellService powerShellService,
@@ -47,6 +50,13 @@ public class WebTerminalController {
         return "redirect:/";
     }
 
+    @PostMapping("/change-engine")
+    public String changeEngine(@RequestParam String engineType) {
+        this.currentEngine = engineType;
+        powerShellService.switchEngine(engineType);
+        return "redirect:/";
+    }
+
     private void setupModel(Model model) {
         var strategy = themeContext.getCurrentStrategy();
         String themeName = strategy.getName().toLowerCase();
@@ -63,8 +73,10 @@ public class WebTerminalController {
 
         model.addAttribute("theme", strategy);
         model.addAttribute("currentThemeName", themeName.contains("dark") ? "dark" : "light");
-        model.addAttribute("history", commandInvoker.getHistory());
 
+        model.addAttribute("currentEngine", currentEngine);
+
+        model.addAttribute("history", commandInvoker.getHistory());
         model.addAttribute("promptHtml", promptHtml);
         model.addAttribute("buttonHtml", buttonHtml);
     }

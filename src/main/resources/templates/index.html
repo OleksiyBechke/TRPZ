@@ -58,17 +58,34 @@
             width: 80%;
             margin: 0 auto 20px auto;
             text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
     </style>
 </head>
 <body>
 
 <div class="controls">
-    <form action="/change-theme" method="post">
-        <label>Тема: </label>
+    <form action="/change-theme" method="post" class="control-group">
+        <label>Theme: </label>
         <select name="themeName" onchange="this.form.submit()">
             <option value="dark" th:selected="${currentThemeName == 'dark'}">Dark</option>
             <option value="light" th:selected="${currentThemeName == 'light'}">Light</option>
+        </select>
+    </form>
+
+    <form action="/change-engine" method="post" class="control-group">
+        <label>Engine (Bridge): </label>
+        <select name="engineType" onchange="this.form.submit()">
+            <option value="windows" th:selected="${currentEngine == 'windows'}">Windows PowerShell</option>
+            <option value="mock" th:selected="${currentEngine == 'mock'}">Mock / Test</option>
         </select>
     </form>
 </div>
