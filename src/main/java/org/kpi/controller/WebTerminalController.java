@@ -4,7 +4,6 @@ import org.kpi.pattern.abstractFactory.WebUIFactory;
 import org.kpi.pattern.abstractFactory.dark.DarkUIFactory;
 import org.kpi.pattern.abstractFactory.light.LightUIFactory;
 import org.kpi.service.CommandInvoker;
-import org.kpi.pattern.command.PowerShellExecuteCommand;
 import org.kpi.service.PowerShellService;
 import org.kpi.pattern.strategy.ThemeContext;
 import org.springframework.stereotype.Controller;
@@ -20,7 +19,6 @@ public class WebTerminalController {
     private final PowerShellService powerShellService;
     private final CommandInvoker commandInvoker;
 
-    // Зберігаємо поточний стан вибору двигуна для відображення в UI
     private String currentEngine = "windows";
 
     public WebTerminalController(ThemeContext themeContext,
@@ -35,13 +33,6 @@ public class WebTerminalController {
     public String index(Model model) {
         setupModel(model);
         return "index";
-    }
-
-    @PostMapping("/execute")
-    public String execute(@RequestParam String commandText, Model model) {
-        PowerShellExecuteCommand command = new PowerShellExecuteCommand(powerShellService, commandText);
-        commandInvoker.executeCommand(command);
-        return "redirect:/";
     }
 
     @PostMapping("/change-theme")
@@ -69,15 +60,13 @@ public class WebTerminalController {
         }
 
         String promptHtml = uiFactory.createPrompt().renderHtml();
-        String buttonHtml = uiFactory.createButton().renderHtml();
 
         model.addAttribute("theme", strategy);
         model.addAttribute("currentThemeName", themeName.contains("dark") ? "dark" : "light");
-
         model.addAttribute("currentEngine", currentEngine);
 
+        // Історію завантажуємо лише при першому вході
         model.addAttribute("history", commandInvoker.getHistory());
         model.addAttribute("promptHtml", promptHtml);
-        model.addAttribute("buttonHtml", buttonHtml);
     }
 }

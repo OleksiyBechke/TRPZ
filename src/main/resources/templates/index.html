@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>PowerShell Terminal Web</title>
+    <title>PowerShell Terminal Web (Client-Server)</title>
     <style>
         body {
             font-family: 'Consolas', monospace;
@@ -50,6 +50,14 @@
             outline: none;
         }
 
+        button {
+            background-color: transparent;
+            border: 1px solid [[${theme.textColor}]];
+            color: [[${theme.textColor}]];
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
         .history-line {
             margin-bottom: 2px;
         }
@@ -62,18 +70,12 @@
             justify-content: flex-end;
             gap: 20px;
         }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
     </style>
 </head>
 <body>
 
 <div class="controls">
-    <form action="/change-theme" method="post" class="control-group">
+    <form action="/change-theme" method="post" style="display:inline;">
         <label>Theme: </label>
         <select name="themeName" onchange="this.form.submit()">
             <option value="dark" th:selected="${currentThemeName == 'dark'}">Dark</option>
@@ -81,8 +83,8 @@
         </select>
     </form>
 
-    <form action="/change-engine" method="post" class="control-group">
-        <label>Engine (Bridge): </label>
+    <form action="/change-engine" method="post" style="display:inline;">
+        <label>Engine: </label>
         <select name="engineType" onchange="this.form.submit()">
             <option value="windows" th:selected="${currentEngine == 'windows'}">Windows PowerShell</option>
             <option value="mock" th:selected="${currentEngine == 'mock'}">Mock / Test</option>
@@ -98,17 +100,57 @@
     <div class="input-area">
         <div class="prompt-container" th:utext="${promptHtml}"></div>
 
-        <form action="/execute" method="post" style="flex-grow: 1; display: flex;">
-            <input type="text" name="commandText" autofocus autocomplete="off" placeholder="Введіть команду..." />
-
-            <div th:utext="${buttonHtml}"></div>
-        </form>
+        <input type="text" id="commandInput" autofocus autocomplete="off" placeholder="Введіть команду..." />
+        <button onclick="sendCommand()">Execute</button>
     </div>
 </div>
 
 <script>
     var output = document.getElementById("output");
-    output.scrollTop = output.scrollHeight;
+    var input = document.getElementById("commandInput");
+
+    function scrollToBottom() {
+        output.scrollTop = output.scrollHeight;
+    }
+    scrollToBottom();
+
+    input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendCommand();
+        }
+    });
+
+    function sendCommand() {
+        const commandText = input.value;
+        if (!commandText.trim()) return;
+
+        input.value = "";
+
+        fetch('/api/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ commandText: commandText })
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'history-line';
+                resultDiv.innerHTML = data.resultHtml;
+
+                output.appendChild(resultDiv);
+                scrollToBottom();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.style.color = 'red';
+                errorDiv.innerText = "Error connecting to server.";
+                output.appendChild(errorDiv);
+            });
+    }
 </script>
 
 </body>

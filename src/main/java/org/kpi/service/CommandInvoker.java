@@ -3,12 +3,10 @@ package org.kpi.service;
 import lombok.Getter;
 import org.kpi.pattern.command.Command;
 import org.kpi.pattern.command.PowerShellExecuteCommand;
-import org.kpi.service.SyntaxHighlighter;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Invoker (Ініціатор).
@@ -26,10 +24,14 @@ public class CommandInvoker {
         this.syntaxHighlighter = syntaxHighlighter;
     }
 
-    public void executeCommand(Command command) {
+    public String executeCommand(Command command) {
+        StringBuilder executionResult = new StringBuilder();
+
         if (command instanceof PowerShellExecuteCommand psCmd) {
             String styledPrompt = "<span style='color: #2ecc71; font-weight: bold;'>PS User&gt; </span>";
-            history.add(styledPrompt + psCmd.getCommandText());
+            String commandLine = styledPrompt + psCmd.getCommandText();
+            history.add(commandLine);
+            executionResult.append(commandLine).append("\n");
         }
 
         String rawResult = command.execute();
@@ -39,10 +41,13 @@ public class CommandInvoker {
             for (String line : lines) {
                 String highlightedLine = syntaxHighlighter.highlight(line);
                 history.add(highlightedLine);
+                executionResult.append(highlightedLine).append("\n");
             }
         } else {
             history.add("");
         }
+
+        return executionResult.toString();
     }
 
     public void clearHistory() {
