@@ -3,7 +3,7 @@ package org.kpi.controller;
 import org.kpi.pattern.abstractFactory.WebUIFactory;
 import org.kpi.pattern.abstractFactory.dark.DarkUIFactory;
 import org.kpi.pattern.abstractFactory.light.LightUIFactory;
-import org.kpi.pattern.command.CommandInvoker;
+import org.kpi.service.CommandInvoker;
 import org.kpi.pattern.command.PowerShellExecuteCommand;
 import org.kpi.service.PowerShellService;
 import org.kpi.pattern.strategy.ThemeContext;

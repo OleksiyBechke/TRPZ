@@ -92,7 +92,7 @@
 
 <div class="terminal-window">
     <div class="output-area" id="output">
-        <div th:each="line : ${history}" class="history-line" th:text="${line}"></div>
+        <div th:each="line : ${history}" class="history-line" th:utext="${line}"></div>
     </div>
 
     <div class="input-area">
