@@ -1,5 +1,8 @@
 package org.kpi.controller;
 
+import org.kpi.pattern.abstractFactory.WebUIFactory;
+import org.kpi.pattern.abstractFactory.dark.DarkUIFactory;
+import org.kpi.pattern.abstractFactory.light.LightUIFactory;
 import org.kpi.pattern.command.PowerShellExecuteCommand;
 import org.kpi.service.CommandInvoker;
 import org.kpi.service.PowerShellService;
@@ -34,9 +37,7 @@ public class WebTerminalController {
     @PostMapping("/execute")
     public String execute(@RequestParam String commandText, Model model) {
         PowerShellExecuteCommand command = new PowerShellExecuteCommand(powerShellService, commandText);
-
         commandInvoker.executeCommand(command);
-
         return "redirect:/";
     }
 
@@ -48,9 +49,23 @@ public class WebTerminalController {
 
     private void setupModel(Model model) {
         var strategy = themeContext.getCurrentStrategy();
-        model.addAttribute("theme", strategy);
-        model.addAttribute("currentThemeName", strategy.getClass().getSimpleName().toLowerCase().contains("dark") ? "dark" : "light");
+        String themeName = strategy.getName().toLowerCase();
 
+        WebUIFactory uiFactory;
+        if (themeName.contains("dark")) {
+            uiFactory = new DarkUIFactory();
+        } else {
+            uiFactory = new LightUIFactory();
+        }
+
+        String promptHtml = uiFactory.createPrompt().renderHtml();
+        String buttonHtml = uiFactory.createButton().renderHtml();
+
+        model.addAttribute("theme", strategy);
+        model.addAttribute("currentThemeName", themeName.contains("dark") ? "dark" : "light");
         model.addAttribute("history", commandInvoker.getHistory());
+
+        model.addAttribute("promptHtml", promptHtml);
+        model.addAttribute("buttonHtml", buttonHtml);
     }
 }

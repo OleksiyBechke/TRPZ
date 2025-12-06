@@ -33,13 +33,11 @@
             display: flex;
             border-top: 1px solid #555;
             padding-top: 10px;
+            align-items: center;
         }
 
-        .prompt {
-            color: [[${theme.promptColor}]];
-            font-weight: bold;
+        .prompt-container {
             margin-right: 10px;
-            align-self: center;
         }
 
         input[type="text"] {
@@ -81,10 +79,12 @@
     </div>
 
     <div class="input-area">
-        <span class="prompt">PS User&gt;</span>
+        <div class="prompt-container" th:utext="${promptHtml}"></div>
+
         <form action="/execute" method="post" style="flex-grow: 1; display: flex;">
             <input type="text" name="commandText" autofocus autocomplete="off" placeholder="Введіть команду..." />
-            <button type="submit" style="display: none;"></button>
+
+            <div th:utext="${buttonHtml}"></div>
         </form>
     </div>
 </div>
