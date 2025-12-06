@@ -3,32 +3,57 @@
 <head>
     <title>PowerShell Terminal Web</title>
     <style>
-        /* Динамічні стилі на основі обраної стратегії */
         body {
             font-family: 'Consolas', monospace;
-            background-color: [[${theme.backgroundColor}]]; /* Значення зі стратегії */
-            color: [[${theme.textColor}]];                 /* Значення зі стратегії */
+            background-color: [[${theme.backgroundColor}]];
+            color: [[${theme.textColor}]];
             margin: 0;
             padding: 20px;
-            transition: background-color 0.3s, color 0.3s;
         }
 
         .terminal-window {
             width: 80%;
             margin: 0 auto;
             border: 1px solid #555;
-            min-height: 400px;
+            height: 500px;
             padding: 10px;
             border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+
+        .input-area {
+            display: flex;
+            border-top: 1px solid #555;
+            padding-top: 10px;
         }
 
         .prompt {
-            color: [[${theme.promptColor}]]; /* Значення зі стратегії */
+            color: [[${theme.promptColor}]];
             font-weight: bold;
+            margin-right: 10px;
+            align-self: center;
         }
 
-        .command {
-            color: [[${theme.commandColor}]]; /* Значення зі стратегії */
+        input[type="text"] {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            color: [[${theme.commandColor}]];
+            font-family: 'Consolas', monospace;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .history-line {
+            margin-bottom: 2px;
         }
 
         .controls {
@@ -36,40 +61,38 @@
             margin: 0 auto 20px auto;
             text-align: right;
         }
-
-        button {
-            padding: 5px 15px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
 
 <div class="controls">
     <form action="/change-theme" method="post">
-        <label>Оберіть тему (Strategy): </label>
-        <select name="themeName">
-            <option value="dark" th:selected="${currentThemeName == 'dark'}">Dark Theme</option>
-            <option value="light" th:selected="${currentThemeName == 'light'}">Light Theme</option>
+        <label>Тема: </label>
+        <select name="themeName" onchange="this.form.submit()">
+            <option value="dark" th:selected="${currentThemeName == 'dark'}">Dark</option>
+            <option value="light" th:selected="${currentThemeName == 'light'}">Light</option>
         </select>
-        <button type="submit">Застосувати</button>
     </form>
 </div>
 
 <div class="terminal-window">
-    <div>
-        <span class="prompt">PS User&gt;</span>
-        <span class="command">Write-Host "Hello Web Strategy"</span>
+    <div class="output-area" id="output">
+        <div th:each="line : ${history}" class="history-line" th:text="${line}"></div>
     </div>
-    <div>
-        <span>Hello Web Strategy</span>
-    </div>
-    <br/>
-    <div>
+
+    <div class="input-area">
         <span class="prompt">PS User&gt;</span>
-        <span class="cursor">_</span>
+        <form action="/execute" method="post" style="flex-grow: 1; display: flex;">
+            <input type="text" name="commandText" autofocus autocomplete="off" placeholder="Введіть команду..." />
+            <button type="submit" style="display: none;"></button>
+        </form>
     </div>
 </div>
+
+<script>
+    var output = document.getElementById("output");
+    output.scrollTop = output.scrollHeight;
+</script>
 
 </body>
 </html>

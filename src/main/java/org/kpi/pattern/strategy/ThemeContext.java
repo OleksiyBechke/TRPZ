@@ -1,8 +1,6 @@
-package org.kpi.service;
+package org.kpi.pattern.strategy;
 
 import lombok.Getter;
-import org.kpi.strategy.DarkThemeStrategy;
-import org.kpi.strategy.WebThemeStrategy;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.kpi.strategy;
+package org.kpi.pattern.strategy;
 
 /**
  * Інтерфейс Стратегії (Strategy).
